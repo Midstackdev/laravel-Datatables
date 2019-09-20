@@ -1840,6 +1840,40 @@ module.exports = {
 __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var query_string__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! query-string */ "./node_modules/query-string/index.js");
 /* harmony import */ var query_string__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(query_string__WEBPACK_IMPORTED_MODULE_0__);
+function ownKeys(object, enumerableOnly) { var keys = Object.keys(object); if (Object.getOwnPropertySymbols) { var symbols = Object.getOwnPropertySymbols(object); if (enumerableOnly) symbols = symbols.filter(function (sym) { return Object.getOwnPropertyDescriptor(object, sym).enumerable; }); keys.push.apply(keys, symbols); } return keys; }
+
+function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { var source = arguments[i] != null ? arguments[i] : {}; if (i % 2) { ownKeys(source, true).forEach(function (key) { _defineProperty(target, key, source[key]); }); } else if (Object.getOwnPropertyDescriptors) { Object.defineProperties(target, Object.getOwnPropertyDescriptors(source)); } else { ownKeys(source).forEach(function (key) { Object.defineProperty(target, key, Object.getOwnPropertyDescriptor(source, key)); }); } } return target; }
+
+function _defineProperty(obj, key, value) { if (key in obj) { Object.defineProperty(obj, key, { value: value, enumerable: true, configurable: true, writable: true }); } else { obj[key] = value; } return obj; }
+
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
 //
 //
 //
@@ -1931,6 +1965,11 @@ __webpack_require__.r(__webpack_exports__);
         id: null,
         form: {},
         errors: []
+      },
+      search: {
+        value: '',
+        operator: 'equals',
+        column: 'id'
       }
     };
   },
@@ -1972,9 +2011,9 @@ __webpack_require__.r(__webpack_exports__);
       });
     },
     getQueryParams: function getQueryParams() {
-      return query_string__WEBPACK_IMPORTED_MODULE_0___default.a.stringify({
+      return query_string__WEBPACK_IMPORTED_MODULE_0___default.a.stringify(_objectSpread({
         limit: this.limit
-      });
+      }, this.search));
     },
     sortBy: function sortBy(column) {
       this.sort.key = column;
@@ -38411,6 +38450,135 @@ var render = function() {
     ]),
     _vm._v(" "),
     _c("div", { staticClass: "card-body" }, [
+      _c(
+        "form",
+        {
+          attrs: { action: "" },
+          on: {
+            submit: function($event) {
+              $event.preventDefault()
+              return _vm.getRecords($event)
+            }
+          }
+        },
+        [
+          _c("label", { attrs: { for: "search" } }, [_vm._v("Search")]),
+          _vm._v(" "),
+          _c("div", { staticClass: "row flex-row" }, [
+            _c("div", { staticClass: " form-group col-md-3" }, [
+              _c(
+                "select",
+                {
+                  directives: [
+                    {
+                      name: "model",
+                      rawName: "v-model",
+                      value: _vm.search.column,
+                      expression: "search.column"
+                    }
+                  ],
+                  staticClass: "form-control",
+                  on: {
+                    change: function($event) {
+                      var $$selectedVal = Array.prototype.filter
+                        .call($event.target.options, function(o) {
+                          return o.selected
+                        })
+                        .map(function(o) {
+                          var val = "_value" in o ? o._value : o.value
+                          return val
+                        })
+                      _vm.$set(
+                        _vm.search,
+                        "column",
+                        $event.target.multiple
+                          ? $$selectedVal
+                          : $$selectedVal[0]
+                      )
+                    }
+                  }
+                },
+                _vm._l(_vm.response.displayable, function(column) {
+                  return _c("option", { domProps: { value: column } }, [
+                    _vm._v(
+                      "\n                            " +
+                        _vm._s(column) +
+                        "\n                        "
+                    )
+                  ])
+                }),
+                0
+              )
+            ]),
+            _vm._v(" "),
+            _c("div", { staticClass: " form-group col-md-3" }, [
+              _c(
+                "select",
+                {
+                  directives: [
+                    {
+                      name: "model",
+                      rawName: "v-model",
+                      value: _vm.search.operator,
+                      expression: "search.operator"
+                    }
+                  ],
+                  staticClass: "form-control",
+                  on: {
+                    change: function($event) {
+                      var $$selectedVal = Array.prototype.filter
+                        .call($event.target.options, function(o) {
+                          return o.selected
+                        })
+                        .map(function(o) {
+                          var val = "_value" in o ? o._value : o.value
+                          return val
+                        })
+                      _vm.$set(
+                        _vm.search,
+                        "operator",
+                        $event.target.multiple
+                          ? $$selectedVal
+                          : $$selectedVal[0]
+                      )
+                    }
+                  }
+                },
+                [_c("option", { attrs: { value: "equals" } }, [_vm._v("=")])]
+              )
+            ]),
+            _vm._v(" "),
+            _c("div", { staticClass: " form-group col-md-6" }, [
+              _c("div", { staticClass: "input-group" }, [
+                _c("input", {
+                  directives: [
+                    {
+                      name: "model",
+                      rawName: "v-model",
+                      value: _vm.search.value,
+                      expression: "search.value"
+                    }
+                  ],
+                  staticClass: "form-control",
+                  attrs: { type: "text" },
+                  domProps: { value: _vm.search.value },
+                  on: {
+                    input: function($event) {
+                      if ($event.target.composing) {
+                        return
+                      }
+                      _vm.$set(_vm.search, "value", $event.target.value)
+                    }
+                  }
+                }),
+                _vm._v(" "),
+                _vm._m(0)
+              ])
+            ])
+          ])
+        ]
+      ),
+      _vm._v(" "),
       _c("div", { staticClass: "row" }, [
         _c("div", { staticClass: "form-group col-md-10" }, [
           _c("label", { attrs: { for: "filter" } }, [
@@ -38664,7 +38832,18 @@ var render = function() {
     ])
   ])
 }
-var staticRenderFns = []
+var staticRenderFns = [
+  function() {
+    var _vm = this
+    var _h = _vm.$createElement
+    var _c = _vm._self._c || _h
+    return _c("span", { staticClass: "input-group-append" }, [
+      _c("button", { staticClass: "btn btn-sm btn-outline-dark" }, [
+        _vm._v("Search")
+      ])
+    ])
+  }
+]
 render._withStripped = true
 
 
