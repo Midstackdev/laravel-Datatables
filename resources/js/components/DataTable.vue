@@ -95,6 +95,7 @@
                                ></div>
                            </th>
                            <th>&nbsp;</th>
+                           <th v-if="response.allow.deletion">&nbsp;</th>
                        </tr>
                    </thead>
                    <tbody>
@@ -120,6 +121,9 @@
                                     <a href="" @click.prevent="update">Save</a> <br>
                                     <a href="" @click.prevent="editing.id = null">Cancel</a>
                                </template>
+                           </td>
+                           <td v-if="response.allow.deletion">
+                               <a href="" @click.prevent="destroy(record.id)">Delete</a>
                            </td>
                        </tr>
                    </tbody>
@@ -257,6 +261,16 @@
                     if(error.response.status === 422){
                         this.creating.errors = error.response.data.errors
                     }
+                })
+            },
+
+            destroy(record) {
+                if(!window.confirm('Are you sure you want to delete this?')) {
+                    return
+                }
+
+                axios.delete(`${this.endpoint}/${record}`).then(() => {
+                    this.getRecords()
                 })
             }
         },

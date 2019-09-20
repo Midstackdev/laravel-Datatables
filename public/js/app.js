@@ -1978,6 +1978,10 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
 //
 //
 //
+//
+//
+//
+//
 
 /* harmony default export */ __webpack_exports__["default"] = ({
   props: ['endpoint'],
@@ -2093,6 +2097,17 @@ function _defineProperty(obj, key, value) { if (key in obj) { Object.definePrope
         if (error.response.status === 422) {
           _this4.creating.errors = error.response.data.errors;
         }
+      });
+    },
+    destroy: function destroy(record) {
+      var _this5 = this;
+
+      if (!window.confirm('Are you sure you want to delete this?')) {
+        return;
+      }
+
+      axios["delete"]("".concat(this.endpoint, "/").concat(record)).then(function () {
+        _this5.getRecords();
       });
     }
   },
@@ -38875,7 +38890,9 @@ var render = function() {
                   ])
                 }),
                 _vm._v(" "),
-                _c("th", [_vm._v(" ")])
+                _c("th", [_vm._v(" ")]),
+                _vm._v(" "),
+                _vm.response.allow.deletion ? _c("th", [_vm._v(" ")]) : _vm._e()
               ],
               2
             )
@@ -39006,7 +39023,25 @@ var render = function() {
                         : _vm._e()
                     ],
                     2
-                  )
+                  ),
+                  _vm._v(" "),
+                  _vm.response.allow.deletion
+                    ? _c("td", [
+                        _c(
+                          "a",
+                          {
+                            attrs: { href: "" },
+                            on: {
+                              click: function($event) {
+                                $event.preventDefault()
+                                return _vm.destroy(record.id)
+                              }
+                            }
+                          },
+                          [_vm._v("Delete")]
+                        )
+                      ])
+                    : _vm._e()
                 ],
                 2
               )
