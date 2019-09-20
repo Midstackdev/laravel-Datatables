@@ -21,19 +21,40 @@ class PlanController extends DataTableController
     // 	];
     // }
 
-    // public function getUpdatableColumns()
-    // {
-    // 	return [
-    // 		'name', 'email', 'created_at'
-    // 	];
-    // }
+    public function getUpdatableColumns()
+    {
+    	return [
+    		'stripe_id', 'price', 'active'
+    	];
+    }
 
-    // public function update($id, Request $request)
-    // {
-    // 	$this->validate($request, [
-    // 		'name' => 'required',
-    // 		'email' => 'required|email|unique:users,email'
-    // 	]);
-    //     $this->builder->find($id)->update($request->only($this->getUpdatableColumns()));
-    // }
+    /**
+     * create a record
+     *
+     * @param Request $request [<description>]
+     * @return void 
+     */
+
+    public function store(Request $request)
+    {
+        $this->validate($request, [
+            'stripe_id' => 'required',
+            'price' => 'required',
+        ]);
+
+        if(!$this->allowCreation) {
+            return;
+        }
+
+        $this->builder->create($request->only($this->getUpdatableColumns()));
+    }
+
+    public function update($id, Request $request)
+    {
+    	$this->validate($request, [
+    		'stripe_id' => 'required',
+            'price' => 'required',
+    	]);
+        $this->builder->find($id)->update($request->only($this->getUpdatableColumns()));
+    }
 }

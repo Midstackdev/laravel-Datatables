@@ -1,9 +1,37 @@
 <template>
  
     <div class="card">
-        <div class="card-header">{{tableName}} TABLE</div>
+        <div class="card-header">
+            {{tableName}} TABLE
+
+            <a href="#" class="float-right btn btn-outline-dark" v-if="response.allow.creation" 
+            @click.prevent="creating.active = !creating.active">
+                {{creating.active ? 'Cancel' : 'New Record'}}
+            </a>
+        </div>
 
         <div class="card-body">
+            
+            <div class="card border-light mb-3" v-if="creating.active">
+                <form action="" class="card-body" @submit.prevent="store">
+                    <div class="form-group row offset-md-2" v-for="column in response.updatable">
+                        <label for="column" class="col-md-3 col-form-label">{{ response.custom_columns[column] || column }}</label>
+                         <div class="col-md-6">
+                          <input type="text" class="form-control" :class="{'is-invalid' : creating.errors[column]}" :id="column" v-model="creating.form[column]">
+                          <span class="invalid-feedback" v-if="creating.errors[column]"> 
+                             <strong>{{creating.errors[column][0]}}</strong>
+                          </span>
+                        </div>
+                    </div>
+
+                    <div class="form-group row offset-md-2">
+                        <div class="col-md-6 offset-md-3">
+                          <button type="submit" class="btn btn-outline-primary">Create</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+
             <form action="" @submit.prevent="getRecords">
                 <label for="search">Search</label>
                 <div class="row flex-row">    
@@ -18,6 +46,11 @@
                     <div class=" form-group col-md-3">
                         <select class="form-control" v-model="search.operator">
                             <option value="equals">=</option>
+                            <option value="contains">contains</option>
+                            <option value="starts_with">starts with</option>
+                            <option value="ends_with">ends with</option>
+                            <option value="greater_than">greater than</option>
+                            <option value="less_than">less than</option>
                         </select>
                     </div>
 
@@ -53,7 +86,7 @@
                    <thead>
                        <tr>
                            <th v-for="column in response.displayable">
-                               <span class="sortable" @click="sortBy(column)">{{column}}</span>
+                               <span class="sortable" @click="sortBy(column)">{{response.custom_columns[column] || column}}</span>
 
                                <div 
                                class="arrow" 
@@ -109,6 +142,7 @@
                     table: '',
                     displayable: [],
                     records: [],
+                    allow: {}
                 },
 
                 sort: {
@@ -128,6 +162,12 @@
                     value: '',
                     operator: 'equals',
                     column: 'id'
+                },
+
+                creating: {
+                    active: false,
+                    form: {},
+                    errors: []
                 }
             }
         },
@@ -200,7 +240,23 @@
                         this.editing.form = {}
                     
                 }).catch(error => {
-                    this.editing.errors = error.response.data.errors
+                    if(error.response.status === 422){
+                        this.editing.errors = error.response.data.errors
+                    }
+                })
+            },
+
+            store() {
+                axios.post(`${this.endpoint}`, this.creating.form).then(() => {
+                    this.getRecords()
+                    this.creating.active = false
+                    this.creating.form = {}
+                    this.creating.errors = []
+
+                }).catch(error => {
+                    if(error.response.status === 422){
+                        this.creating.errors = error.response.data.errors
+                    }
                 })
             }
         },

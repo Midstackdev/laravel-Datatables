@@ -9,6 +9,8 @@ use Illuminate\Http\Request;
 
 class UserController extends DataTableController
 {
+	protected $allowCreation = true;
+
     public function builder()
     {
     	return User::query();
@@ -19,6 +21,14 @@ class UserController extends DataTableController
     	return [
     		'id', 'name', 'email', 'created_at'
     	];
+    }
+
+    public function getCustomColumnNames()
+    {
+        return [
+        	'name' => 'Full name',
+        	'email' => 'Email address'
+        ];
     }
 
     public function getUpdatableColumns()

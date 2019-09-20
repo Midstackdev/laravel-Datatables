@@ -2,14 +2,17 @@
 
 namespace App\Http\Controllers\DataTable;
 
+
 use App\Http\Controllers\Controller;
 use Exception;
+use Illuminate\Support\Arr;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Schema;
 
 abstract class DataTableController extends Controller
 {
+    protected $allowCreation = true;
 	protected $builder;
 
     abstract public function builder();
@@ -32,7 +35,11 @@ abstract class DataTableController extends Controller
                 'table' => $this->getTableName(),
                 'displayable' => array_values($this->getDisplayableColumns()),
                 'updatable' => array_values($this->getUpdatableColumns()),
+                'custom_columns' => $this->getCustomColumnNames(),
                 'records' => $this->getRecords($request),
+                'allow' => [
+                    'creation' => $this->allowCreation,
+                ]
             ]
     	]);
     }
@@ -42,9 +49,27 @@ abstract class DataTableController extends Controller
         $this->builder->find($id)->update($request->only($this->getUpdatableColumns()));
     }
 
+    public function store(Request $request)
+    {
+        if(!$this->allowCreation) {
+            return;
+        }
+
+        $this->builder->create($request->only($this->getUpdatableColumns()));
+    }
+
     public function getDisplayableColumns()
     {
         return array_diff($this->getDatabaseColumnNames(), $this->builder->getModel()->getHidden());
+    }
+
+    /**
+     * Get Custom column names
+     * @return array
+     */
+    public function getCustomColumnNames()
+    {
+        return [];
     }
 
     public function getUpdatableColumns()
@@ -64,6 +89,60 @@ abstract class DataTableController extends Controller
 
     public function getRecords(Request $request)
     {
+        $builder = $this->builder;
+
+        if($this->hasSearchQuery($request)) {
+
+            $builder = $this->buildSearch($builder, $request);
+        }
+
         return $this->builder->limit($request->limit)->get($this->getDisplayableColumns());
+    }
+
+    protected function hasSearchQuery(Request $request) 
+    {
+        return count(array_filter($request->only(['column', 'operator', 'value']))) === 3;
+    }
+
+    protected function buildSearch(Builder $builder, Request $request)
+    {
+        $queyParts = $this->resolveQueryParts($request->operator, $request->value);
+
+        return $builder->where($request->column, $queyParts['operator'], $queyParts['value']);
+    }
+
+    protected function resolveQueryParts($operator, $value)
+    {
+        return Arr::get([
+            'equals' => [
+                'operator' => '=',
+                'value' => $value
+            ],
+
+            'contains' => [
+                'operator' => 'LIKE',
+                'value' => "%{$value}%"
+            ],
+
+            'starts_with' => [
+                'operator' => 'LIKE',
+                'value' => "{$value}%"
+            ],
+
+            'ends_with' => [
+                'operator' => 'LIKE',
+                'value' => "%{$value}"
+            ],
+
+            'greater_than' => [
+                'operator' => '>',
+                'value' => $value
+            ],
+
+            'less_than' => [
+                'operator' => '<',
+                'value' => $value
+            ],
+        ], $operator);
     }
 }
