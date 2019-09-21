@@ -80,12 +80,12 @@ abstract class DataTableController extends Controller
      * @param  Request $request
      * @return Illluminate\Http\Response
      */
-    public function destroy($id, Request $request)
+    public function destroy($ids, Request $request)
     {
         if(!$this->allowDeletion) {
             return;
         }
-        $this->builder->find($id)->delete();
+        $this->builder->whereIn('id', explode(',', $ids))->delete();
     }
 
     public function getDisplayableColumns()

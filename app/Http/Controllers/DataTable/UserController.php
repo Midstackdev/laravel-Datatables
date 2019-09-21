@@ -10,7 +10,7 @@ use Illuminate\Http\Request;
 class UserController extends DataTableController
 {
 	protected $allowCreation = true;
-	protected $allowDeletion = false;
+	protected $allowDeletion = true;
 
     public function builder()
     {
